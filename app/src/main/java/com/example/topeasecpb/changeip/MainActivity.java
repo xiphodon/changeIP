@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private Button btn_stop;
     private SharedPreferences sp;
     private EditText et_zhouqi;
+    private Switch mySwitch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
      * 初始化UI
      */
     private void initUI() {
+        mySwitch = findViewById(R.id.my_switch);
         tv_1 = findViewById(R.id.tv_1);
         tv_2 = findViewById(R.id.tv_2);
         tv_3 = findViewById(R.id.tv_3);
@@ -60,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         tv_1.setText("1、请输入切换一次ip的时间周期");
         tv_2.setText("2、点击start按钮开启外挂");
         tv_3.setText("3、进入设置，打开“changeIP”功能");
-        tv_4.setText("4、进入移动网络界面，保持置顶，外挂开始工作");
+        tv_4.setText("4、置顶移动网络/APN界面，外挂开始工作");
         tv_5.setText("5、如需停止外挂，点击stop按钮停止外挂");
     }
 
@@ -97,8 +100,18 @@ public class MainActivity extends AppCompatActivity {
 
                 sp.edit().putFloat("time", et_zhouqi_f).commit();
 
-                startService(new Intent(MainActivity.this, MyService.class));
-                Toast.makeText(getBaseContext(), "外挂已开启", Toast.LENGTH_SHORT).show();
+                String start_toast_str = "移动数据 外挂已开启";
+                Class clazz = MyService.class;
+
+                if(mySwitch.isChecked()){
+                    start_toast_str = "网络APN 外挂已开启";
+                    clazz = MyServiceAPN.class;
+                }
+
+                startService(new Intent(MainActivity.this, clazz));
+                Toast.makeText(getBaseContext(), start_toast_str, Toast.LENGTH_SHORT).show();
+
+                btn_start.setEnabled(false);
 
             }
         });
@@ -115,11 +128,18 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
+                String action_str = "com.example.topease.changeip";
+
                 Intent intent = new Intent();
                 intent.putExtra("isStop", true);
-                intent.setAction("com.example.topease.changeip");
+
+                if(mySwitch.isChecked()){
+                    action_str = "com.example.topease.changeipapn";
+                }
+                intent.setAction(action_str);
                 sendBroadcast(intent);
 
+                btn_start.setEnabled(true);
             }
         });
 
