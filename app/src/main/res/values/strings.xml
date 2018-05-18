@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">changeIP</string>
+    <string name="app_name_APN">changeIP_APN</string>
     <string name="desc">IP自动转换器(测试版)</string>
 </resources>
