@@ -37,6 +37,8 @@ public class MyServiceAPN extends AccessibilityService {
 
                     Log.i("div", "==========================================");
 
+                    Thread.sleep(2 * 1000);
+
                 } catch (Exception e) {
                     Log.i("exception", e.toString());
                 }
@@ -48,7 +50,17 @@ public class MyServiceAPN extends AccessibilityService {
 
             target = getTargetView();
 
-            handler.postDelayed(this, (long) (zhouqi * 60 * 1000));
+            // gprs 信号质量优于 wap，若下次目标为gprs，则等待时间缩短至offset倍周期
+            List<AccessibilityNodeInfo> list_gprs =
+                    target.findAccessibilityNodeInfosByText("GPRS");
+
+            float offset = 1.0f;
+
+            if(list_gprs != null && list_gprs.size() > 0){
+                offset = 0.4f;
+            }
+
+            handler.postDelayed(this, (long) (offset * zhouqi * 60 * 1000));
         }
     };
     private BroadcastReceiver changeIPBroadcastReceiver;
