@@ -50,9 +50,12 @@ public class MyServiceAPN extends AccessibilityService {
 
             target = getTargetView();
 
-            // gprs 信号质量优于 wap，若下次目标为gprs，则等待时间缩短至offset倍周期
-            List<AccessibilityNodeInfo> list_gprs =
-                    target.findAccessibilityNodeInfosByText("GPRS");
+            List<AccessibilityNodeInfo> list_gprs = null;
+
+            if(target != null){
+                // gprs 信号质量优于 wap，若下次目标为gprs，则等待时间缩短至offset倍周期
+                list_gprs = target.findAccessibilityNodeInfosByText("GPRS");
+            }
 
             float offset = 1.0f;
 
