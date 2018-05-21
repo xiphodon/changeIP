@@ -55,8 +55,12 @@ public class MyServiceAPN extends AccessibilityService {
 
                     float offset = 1.0f;
                     // gprs 信号质量优于 wap，若下次目标为gprs，则等待时间缩短至offset倍周期
-                    if(hasGPRS(target)){
-                        offset = 0.4f;
+                    try {
+                        if(hasGPRS(target)){
+                            offset = 0.4f;
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
 
                     handler.postDelayed(runnable, (long) (offset * zhouqi * 60 * 1000));
@@ -92,13 +96,18 @@ public class MyServiceAPN extends AccessibilityService {
      * @param _target
      * @return
      */
-    public boolean hasGPRS(AccessibilityNodeInfo _target){
-        List<AccessibilityNodeInfo> list_gprs = _target.findAccessibilityNodeInfosByText("GPRS");
-        if(list_gprs != null && list_gprs.size() > 0){
-            return true;
+    public boolean hasGPRS(AccessibilityNodeInfo _target) throws Exception{
+        if(_target != null){
+            List<AccessibilityNodeInfo> list_gprs = _target.findAccessibilityNodeInfosByText("GPRS");
+            if(list_gprs != null && list_gprs.size() > 0){
+                return true;
+            }else {
+                return false;
+            }
         }else {
-            return false;
+            throw new Exception("_target is null");
         }
+
     }
 
 
@@ -202,7 +211,11 @@ public class MyServiceAPN extends AccessibilityService {
 //                Log.i("isCheckable", item.isCheckable() + "");
 //                Log.i("isChecked", item.isChecked() + "");
                 if (item.isCheckable() && !item.isChecked()) {
-                    Log.i("find target view", (hasGPRS(item)?"GPRS__":"WAP__") + item.toString());
+                    try {
+                        Log.i("find target view", (hasGPRS(item)?"GPRS__":"WAP__") + item.toString());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     AccessibilityNodeInfo parent = item.getParent();
 //                    Log.i("target parent view", parent.toString());
                     if(parent.isClickable()){
