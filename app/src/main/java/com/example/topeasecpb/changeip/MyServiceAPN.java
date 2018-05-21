@@ -8,7 +8,9 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.util.Log;
+import android.util.TimeUtils;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.accessibility.AccessibilityWindowInfo;
@@ -17,6 +19,7 @@ import java.util.List;
 
 public class MyServiceAPN extends AccessibilityService {
 
+    long time_pre = -1;
     // 循环周期
     float zhouqi = (float) 1.0;
 
@@ -26,18 +29,14 @@ public class MyServiceAPN extends AccessibilityService {
     Runnable runnable = new Runnable() {
         @Override
         public void run() {
-            Log.i("while", "循环中...");
+//            Log.i("while", "looping...");
 
             if (target != null) {
                 try {
-                    Log.i("runable_targetview", target.toString());
+//                    Log.i("runable_targetview", target.toString());
 
+                    Log.i("choice_new_APN", hasGPRS(target)?"switch to GPRS":"switch to WAP");
                     target.performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                    Log.i("选择新APN", target.toString());
-
-                    Log.i("div", "==========================================");
-
-                    Thread.sleep(2 * 1000);
 
                 } catch (Exception e) {
                     Log.i("exception", e.toString());
@@ -48,25 +47,60 @@ public class MyServiceAPN extends AccessibilityService {
 
             }
 
-            target = getTargetView();
+            Log.i("loop_div", "==========================================" + getCostTimes());
 
-            List<AccessibilityNodeInfo> list_gprs = null;
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    target = getTargetView();
 
-            if(target != null){
-                // gprs 信号质量优于 wap，若下次目标为gprs，则等待时间缩短至offset倍周期
-                list_gprs = target.findAccessibilityNodeInfosByText("GPRS");
-            }
+                    float offset = 1.0f;
+                    // gprs 信号质量优于 wap，若下次目标为gprs，则等待时间缩短至offset倍周期
+                    if(hasGPRS(target)){
+                        offset = 0.4f;
+                    }
 
-            float offset = 1.0f;
+                    handler.postDelayed(runnable, (long) (offset * zhouqi * 60 * 1000));
+                }
+            }, 4 * 1000);
 
-            if(list_gprs != null && list_gprs.size() > 0){
-                offset = 0.4f;
-            }
 
-            handler.postDelayed(this, (long) (offset * zhouqi * 60 * 1000));
         }
     };
+
     private BroadcastReceiver changeIPBroadcastReceiver;
+
+
+    /**
+     * 获取花费时间
+     * @return
+     */
+    public double getCostTimes(){
+        if(time_pre == -1){
+            time_pre = System.currentTimeMillis();
+            return 0;
+        }else {
+            long time_now = System.currentTimeMillis();
+            long time_range = time_now - time_pre;
+            time_pre = time_now;
+            return time_range/1000.0;
+        }
+    }
+
+
+    /**
+     * 是否为GPRS的apn
+     * @param _target
+     * @return
+     */
+    public boolean hasGPRS(AccessibilityNodeInfo _target){
+        List<AccessibilityNodeInfo> list_gprs = _target.findAccessibilityNodeInfosByText("GPRS");
+        if(list_gprs != null && list_gprs.size() > 0){
+            return true;
+        }else {
+            return false;
+        }
+    }
 
 
     @Override
@@ -110,8 +144,6 @@ public class MyServiceAPN extends AccessibilityService {
                         handler.removeCallbacks(runnable);
                         handler.postDelayed(runnable, 500);
                     }
-                } else {
-                    target = _target;
                 }
 
 
@@ -162,18 +194,18 @@ public class MyServiceAPN extends AccessibilityService {
 
         AccessibilityNodeInfo nodeInfo = getRootInActiveWindow();
         if(nodeInfo != null){
-            Log.i("getTargetView", "nodeInfo != null");
+//            Log.i("getTargetView", "nodeInfo != null");
             List<AccessibilityNodeInfo> list_button = nodeInfo
                     .findAccessibilityNodeInfosByText("中国电信");
 
             for (AccessibilityNodeInfo item : list_button) {
-                Log.i("find view:", item.toString());
-                Log.i("isCheckable", item.isCheckable() + "");
-                Log.i("isChecked", item.isChecked() + "");
+//                Log.i("find view:", item.toString());
+//                Log.i("isCheckable", item.isCheckable() + "");
+//                Log.i("isChecked", item.isChecked() + "");
                 if (item.isCheckable() && !item.isChecked()) {
-                    Log.i("find target view:", item.toString());
+                    Log.i("find target view", (hasGPRS(item)?"GPRS__":"WAP__") + item.toString());
                     AccessibilityNodeInfo parent = item.getParent();
-                    Log.i("target parent view:", parent.toString());
+//                    Log.i("target parent view", parent.toString());
                     if(parent.isClickable()){
                         return parent;
                     }

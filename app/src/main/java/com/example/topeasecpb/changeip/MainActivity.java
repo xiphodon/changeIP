@@ -2,6 +2,7 @@ package com.example.topeasecpb.changeip;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -99,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 sp.edit().putFloat("time", et_zhouqi_f).commit();
+                sp.edit().putBoolean("apn_isChecked", mySwitch.isChecked()).commit();
 
                 String start_toast_str = "移动数据 外挂已开启";
                 Class clazz = MyService.class;
@@ -122,24 +124,31 @@ public class MainActivity extends AppCompatActivity {
 
                 Toast.makeText(getBaseContext(), "外挂已停止", Toast.LENGTH_SHORT).show();
 
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                new Thread(){
+                    @Override
+                    public void run() {
 
-                String action_str = "com.example.topease.changeip";
+                        SystemClock.sleep(1000);
 
-                Intent intent = new Intent();
-                intent.putExtra("isStop", true);
+                        String action_str = "com.example.topease.changeip";
 
-                if(mySwitch.isChecked()){
-                    action_str = "com.example.topease.changeipapn";
-                }
-                intent.setAction(action_str);
-                sendBroadcast(intent);
+                        Intent intent = new Intent();
+                        intent.putExtra("isStop", true);
 
-                btn_start.setEnabled(true);
+                        if(sp.getBoolean("apn_isChecked", false)){
+                            action_str = "com.example.topease.changeipapn";
+                        }
+                        intent.setAction(action_str);
+                        sendBroadcast(intent);
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                btn_start.setEnabled(true);
+                            }
+                        });
+                    }
+                }.start();
             }
         });
 
