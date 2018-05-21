@@ -29,9 +29,10 @@ public class MyServiceAPN extends AccessibilityService {
     Runnable runnable = new Runnable() {
         @Override
         public void run() {
-//            Log.i("while", "looping...");
+            Log.i("loop_div", "=====================" + getCostTimes());
 
             if (target != null) {
+
                 try {
 //                    Log.i("runable_targetview", target.toString());
 
@@ -46,8 +47,6 @@ public class MyServiceAPN extends AccessibilityService {
                 Log.i("target", "target is null");
 
             }
-
-            Log.i("loop_div", "==========================================" + getCostTimes());
 
             handler.postDelayed(new Runnable() {
                 @Override
