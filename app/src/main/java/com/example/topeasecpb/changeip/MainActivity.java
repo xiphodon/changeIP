@@ -1,8 +1,12 @@
 package com.example.topeasecpb.changeip;
 
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.Build;
 import android.os.SystemClock;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -66,6 +70,20 @@ public class MainActivity extends AppCompatActivity {
         tv_3.setText("3、进入设置，打开“changeIP”功能");
         tv_4.setText("4、置顶移动网络/APN界面，外挂开始工作");
         tv_5.setText("5、如需停止外挂，点击stop按钮停止外挂");
+
+//        Toast.makeText(this, getScreenBrightness() + "", Toast.LENGTH_LONG).show();
+//
+//        new Thread(){
+//            @Override
+//            public void run() {
+//                SystemClock.sleep(3000);
+//                setScreenBrightness(2);
+//                SystemClock.sleep(3000);
+//                setScreenBrightness(0);
+//                SystemClock.sleep(3000);
+//                setScreenBrightness(1);
+//            }
+//        }.start();
     }
 
     /**
@@ -154,6 +172,53 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * 设置手机屏幕亮度为手动模式
+     */
+    public void setScrennManualMode() {
+        ContentResolver contentResolver = this.getContentResolver();
+        try {
+            int mode = Settings.System.getInt(contentResolver,
+                    Settings.System.SCREEN_BRIGHTNESS_MODE);
+            if (mode == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
+                Settings.System.putInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE,
+                        Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
+            }
+        } catch (Settings.SettingNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 
+    /**
+     * 获取屏幕当前亮度
+     * @return
+     */
+    private int getScreenBrightness() {
+        ContentResolver contentResolver = this.getContentResolver();
+        int defVal = 125;
+        return Settings.System.getInt(contentResolver,
+                Settings.System.SCREEN_BRIGHTNESS, defVal);
+    }
+
+    /**
+     * 设置屏幕亮度
+     */
+    private void setScreenBrightness(int value) {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!Settings.System.canWrite(this)) {
+                Intent intent = new Intent(android.provider.Settings.ACTION_MANAGE_WRITE_SETTINGS);
+                intent.setData(Uri.parse("package:" + this.getPackageName()));
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                this.startActivity(intent);
+            } else {
+                //有了权限，具体的动作
+                setScrennManualMode();
+                ContentResolver contentResolver = this.getContentResolver();
+                Settings.System.putInt(contentResolver,
+                        Settings.System.SCREEN_BRIGHTNESS, value);
+            }
+        }
+
+    }
 
 }
