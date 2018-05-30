@@ -22,6 +22,7 @@ public class MyServiceAPN extends AccessibilityService {
     long time_pre = -1;
     // 循环周期
     float zhouqi = (float) 1.0;
+    private boolean is_dianxin_chard;
 
     AccessibilityNodeInfo target = null;
     Handler handler = new Handler();
@@ -93,12 +94,20 @@ public class MyServiceAPN extends AccessibilityService {
 
     /**
      * 是否为GPRS的apn
+     * (注：电信卡位GPRS，联通卡为net信号)
      * @param _target
      * @return
      */
     public boolean hasGPRS(AccessibilityNodeInfo _target) throws Exception{
+        String search_key_word;
+        if(is_dianxin_chard){
+            search_key_word = "GPRS";
+        }else{
+            search_key_word = "互联网";
+        }
+
         if(_target != null){
-            List<AccessibilityNodeInfo> list_gprs = _target.findAccessibilityNodeInfosByText("GPRS");
+            List<AccessibilityNodeInfo> list_gprs = _target.findAccessibilityNodeInfosByText(search_key_word);
             if(list_gprs != null && list_gprs.size() > 0){
                 return true;
             }else {
@@ -117,6 +126,8 @@ public class MyServiceAPN extends AccessibilityService {
         SharedPreferences sp = getSharedPreferences("changeip", MODE_PRIVATE);
         zhouqi = sp.getFloat("time",1.0f);
         Log.i("zhouqi", zhouqi + "");
+        is_dianxin_chard = sp.getBoolean("dianxin_isChecked", false);
+        Log.i("is_dianxin_chard", is_dianxin_chard + "");
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -199,12 +210,18 @@ public class MyServiceAPN extends AccessibilityService {
      * @return
      */
     private AccessibilityNodeInfo getTargetView() {
+        String search_key_word;
+        if(is_dianxin_chard){
+            search_key_word = "中国电信";
+        }else{
+            search_key_word = "沃宽带";
+        }
 
         AccessibilityNodeInfo nodeInfo = getRootInActiveWindow();
         if(nodeInfo != null){
 //            Log.i("getTargetView", "nodeInfo != null");
             List<AccessibilityNodeInfo> list_button = nodeInfo
-                    .findAccessibilityNodeInfosByText("中国电信");
+                    .findAccessibilityNodeInfosByText(search_key_word);
 
             for (AccessibilityNodeInfo item : list_button) {
 //                Log.i("find view:", item.toString());

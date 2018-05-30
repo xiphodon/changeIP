@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences sp;
     private EditText et_zhouqi;
     private Switch mySwitch;
+    private Switch myCardSwitch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +47,9 @@ public class MainActivity extends AppCompatActivity {
      * 初始化UI
      */
     private void initUI() {
+        //联通 or 电信
+        myCardSwitch = findViewById(R.id.my_card_switch);
+        //数据 or apn
         mySwitch = findViewById(R.id.my_switch);
         tv_1 = findViewById(R.id.tv_1);
         tv_2 = findViewById(R.id.tv_2);
@@ -119,6 +123,7 @@ public class MainActivity extends AppCompatActivity {
 
                 sp.edit().putFloat("time", et_zhouqi_f).commit();
                 sp.edit().putBoolean("apn_isChecked", mySwitch.isChecked()).commit();
+                sp.edit().putBoolean("dianxin_isChecked", myCardSwitch.isChecked()).commit();
 
                 String start_toast_str = "移动数据 外挂已开启";
                 Class clazz = MyService.class;

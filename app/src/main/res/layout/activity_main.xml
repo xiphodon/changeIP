@@ -16,6 +16,35 @@
         android:gravity="center">
 
         <TextView
+            android:id="@+id/tv_card_switch_left"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:textColor="#ff0000ff"
+            android:text="中国联通"/>
+
+        <Switch
+            android:id="@+id/my_card_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:theme="@style/MySwitch"/>
+
+        <TextView
+            android:id="@+id/tv_card_switch_right"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:textColor="#ff0000ff"
+            android:text="中国电信"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="30dp"
+        android:gravity="center">
+
+        <TextView
             android:id="@+id/tv_switch_left"
             android:layout_width="wrap_content"
             android:layout_height="20dp"
