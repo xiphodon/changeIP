@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
      * 初始化UI
      */
     private void initUI() {
-        //联通 or 电信
+        //移动 or 电信
         myCardSwitch = findViewById(R.id.my_card_switch);
         //数据 or apn
         mySwitch = findViewById(R.id.my_switch);

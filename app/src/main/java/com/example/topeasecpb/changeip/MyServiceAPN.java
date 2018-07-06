@@ -22,6 +22,7 @@ public class MyServiceAPN extends AccessibilityService {
     long time_pre = -1;
     // 循环周期
     float zhouqi = (float) 1.0;
+    float offset_alpha = (float) 1.0;
     private boolean is_dianxin_chard;
 
     AccessibilityNodeInfo target = null;
@@ -58,7 +59,7 @@ public class MyServiceAPN extends AccessibilityService {
                     // gprs 信号质量优于 wap，若下次目标为gprs，则等待时间缩短至offset倍周期
                     try {
                         if(hasGPRS(target)){
-                            offset = 0.4f;
+                            offset = offset_alpha;
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -94,7 +95,7 @@ public class MyServiceAPN extends AccessibilityService {
 
     /**
      * 是否为GPRS的apn
-     * (注：电信卡位GPRS，联通卡为net信号)
+     * (注：电信卡、移动卡为GPRS、net信号)
      * @param _target
      * @return
      */
@@ -103,7 +104,7 @@ public class MyServiceAPN extends AccessibilityService {
         if(is_dianxin_chard){
             search_key_word = "GPRS";
         }else{
-            search_key_word = "互联网";
+            search_key_word = "GPRS";
         }
 
         if(_target != null){
@@ -214,7 +215,7 @@ public class MyServiceAPN extends AccessibilityService {
         if(is_dianxin_chard){
             search_key_word = "中国电信";
         }else{
-            search_key_word = "沃宽带";
+            search_key_word = "中国移动";
         }
 
         AccessibilityNodeInfo nodeInfo = getRootInActiveWindow();
